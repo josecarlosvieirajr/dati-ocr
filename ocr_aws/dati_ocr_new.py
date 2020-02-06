@@ -1,38 +1,90 @@
+import boto3
+from dotenv import load_dotenv
+
 from datiocr.enumerations.enum_test import EnumTeste
-from datiocr.service.task import DatiOcr
-from ocr_aws.test_ocr_new import TratamentoOCR
+
+# from datiocr.service.task import DatiOcr
+
+load_dotenv()
 
 
 class GeneralOCR:
-    @staticmethod
-    def run():
 
+    def run(self, bucket, doc):
+        size = 100
+        pag = 0
+        front_table = []
+        render_front = {}
+        status = "IN_PROGRESS"
+        response_status = dict()
+        client = boto3.client('textract')
+        comprehend = boto3.client('comprehendmedical')
 
-        bucket = "ocrdatidev"
-        doc = 'IE_000.pdf'
-        top = DatiOcr(bucket, doc)
-        response = top.run()
-        # return TratamentoOCR(EnumTeste.LISTA_TESTE.value).format()
-        return TratamentoOCR(response).format()
-        # lista_pages = []
-        # geral = []
-        # arrayzao = {}
+        response = client.start_document_analysis(
+            DocumentLocation={
+                'S3Object': {
+                    'Bucket': bucket,
+                    'Name': doc
+                }
+            },
+            FeatureTypes=['FORMS']
+        )
+
+        while status == "IN_PROGRESS":
+            response_status = client.get_document_analysis(JobId=response["JobId"])
+            status = response_status["JobStatus"]
+
+        print(response_status['DocumentMetadata']['Pages'])
+        if response_status['DocumentMetadata']['Pages'] > 1:
+            for item in response_status['Blocks']:
+                if item["BlockType"] == "LINE":
+                    if item['Page'] != pag and pag != 0:
+                        render_front[pag] = front_table
+                        front_table = []
+                    front_table.append([
+                        item['Text'],
+                        item['Geometry']['BoundingBox']['Width'] * size,
+                        item['Geometry']['BoundingBox']['Height'] * size * 2.5,
+                        item['Geometry']['BoundingBox']['Left'] * size,
+                        item['Geometry']['BoundingBox']['Top'] * size * 2.3,
+                    ])
+                    if item['Page'] > pag:
+                        pag = item['Page']
+        else:
+            for item in response_status['Blocks']:
+                if item["BlockType"] == "LINE":
+                    front_table.append([
+                        item['Text'],
+                        item['Geometry']['BoundingBox']['Width'] * size,
+                        item['Geometry']['BoundingBox']['Height'] * size * 2.5,
+                        item['Geometry']['BoundingBox']['Left'] * size,
+                        item['Geometry']['BoundingBox']['Top'] * size * 2.3,
+                    ])
+            render_front['1'] = front_table
+
+        return render_front
+        # for table in front_table:
+        #     front_table_intelligent.append(comprehend.detect_entities(Text=table[0]))
         #
-        # for item in response["Blocks"]:
-        #     if item['Page'] not in lista_pages:
-        #         lista_pages.append(item['Page'])
+        # for item in front_table_intelligent:
+        #     for a in item['Entities']:
+        #         if a['Type'] == 'ID':
+        #             render_front.append(a['Text'])
+        #     for b in item['UnmappedAttributes']:
+        #         render_front.append(b['Attribute']['Text'])
         #
-        # for val in lista_pages:
-        #     for item in response["Blocks"]:
-        #         if item["BlockType"] == "LINE" and item['Page'] == val:
-        #             geral.append([
-        #                 item['Text'],
-        #                 item['Geometry']['BoundingBox']['Width'] * 100,
-        #                 item['Geometry']['BoundingBox']['Height'] * 250,
-        #                 item['Geometry']['BoundingBox']['Left'] * 100,
-        #                 item['Geometry']['BoundingBox']['Top'] * 150,
-        #             ])
-        #     arrayzao[val] = geral
-        #     geral = []
-
-        # return TratamentoOCR(arrayzao).format()
+        # values = []
+        #
+        # for i in front_table:
+        #     for a in render_front:
+        #         if i[0] == a:
+        #             values.append(i)
+        #
+        # add = []
+        # for i in range(len(values)):
+        #     try:
+        #         if values[i] != values[i + 1]:
+        #             add.append(values[i])
+        #     except Exception:
+        #         break
+        # return add

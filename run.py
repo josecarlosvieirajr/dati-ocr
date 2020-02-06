@@ -1,14 +1,24 @@
-from datiocr.service.task import DatiOcr
-from datetime import datetime
+from datiocr.enumerations.enum_test import EnumTeste
 
-if __name__ == '__main__':
-    bucket = "ocrdatidev"
-    init = datetime.now()
-    # lista = ['IE_000.pdf', 'IE_001.pdf', 'IE_002.pdf', 'IE_003.pdf', 'IE_004.pdf', 'IE_005.pdf', 'IE_006.pdf']
-    lista = ['IE_000.pdf']
-    for i in lista:
-        local_init = datetime.now()
-        wc = DatiOcr(bucket, i)
-        print(wc.run(), f"TIME LOCAL EXECUTION {datetime.now() - local_init}")
-    print(f"###### TIME EXECUTION FOR {len(lista)}-PDFS IS: {datetime.now() - init} ######")
+front_table = {}
+add = []
+size = 100
+pag = 0
+response_status = EnumTeste.BACK_TEST.value
+if response_status['DocumentMetadata']['Pages'] > 1:
+    for item in response_status['Blocks']:
+        if item["BlockType"] == "LINE":
+            if item['Page'] != pag and pag != 0:
+                front_table[pag] = add
+                add = []
+            add.append([
+                item['Text'],
+                item['Geometry']['BoundingBox']['Width'] * size,
+                item['Geometry']['BoundingBox']['Height'] * size * 2.5,
+                item['Geometry']['BoundingBox']['Left'] * size,
+                item['Geometry']['BoundingBox']['Top'] * size * 2.3,
+            ])
+            if item['Page'] > pag:
+                pag = item['Page']
 
+    print(front_table[2])

@@ -10,6 +10,7 @@
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 
     <script>
+
         $(window).on('load', function(){
             var selectorPage = $(".page");
 
@@ -18,6 +19,11 @@
                 $(".page." + (key + 1)).css({ position: "relative"});
             })
         });
+
+        function executeClick(){
+            var campo = document.getElementById('key');
+            alert(campo.value);
+            }
     </script>
 </head>
 <body>
@@ -27,8 +33,8 @@
         {% for a in content %}
             <div class="page {{a}}" style="width: 100%">
                 {% for key in content[a] %}
-                    <div class="text-center" style="width:{{ key[1] }}vw; height:{{ key[2] }}%; left:{{ key[3] }}vw; top:{{ key[4] }}%;position: absolute;">
-                        <p>{{ key[0] }}</p>
+                    <div id="myDiv"  onclick="executeClick()" class="text-center" style="border:1px solid; width:{{ key[1] }}vw; height:{{ key[2] }}%; left:{{ key[3] }}vw; top:{{ key[4] }}%;position: absolute;">
+                        <p id="key">{{ key[0] }}</p>
                     </div>
                 {% endfor %}
             </div>
