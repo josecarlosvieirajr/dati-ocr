@@ -1,8 +1,6 @@
 import boto3
 from dotenv import load_dotenv
 
-from datiocr.enumerations.enum_test import EnumTeste
-
 # from datiocr.service.task import DatiOcr
 
 load_dotenv()
@@ -27,29 +25,30 @@ class GeneralOCR:
                     'Name': doc
                 }
             },
-            FeatureTypes=['FORMS']
+            FeatureTypes=['TABLES']
         )
 
         while status == "IN_PROGRESS":
             response_status = client.get_document_analysis(JobId=response["JobId"])
             status = response_status["JobStatus"]
-
-        print(response_status['DocumentMetadata']['Pages'])
+        print('Total de Paginas', response_status['DocumentMetadata']['Pages'])
         if response_status['DocumentMetadata']['Pages'] > 1:
             for item in response_status['Blocks']:
                 if item["BlockType"] == "LINE":
-                    if item['Page'] != pag and pag != 0:
-                        render_front[pag] = front_table
+
+                    if item['Page'] > pag:
+                        print('PAGINA ', pag+1, item['Text'])
+                        render_front[pag+1] = front_table
                         front_table = []
+                    pag = item['Page']
+                    # multiply = item['Page'] if item['Page'] == 1 else item['Page'] * 2.3
                     front_table.append([
                         item['Text'],
                         item['Geometry']['BoundingBox']['Width'] * size,
                         item['Geometry']['BoundingBox']['Height'] * size * 2.5,
                         item['Geometry']['BoundingBox']['Left'] * size,
-                        item['Geometry']['BoundingBox']['Top'] * size * 2.3,
+                        item['Geometry']['BoundingBox']['Top'] * size * 2.3 * (item['Page'] * 3),
                     ])
-                    if item['Page'] > pag:
-                        pag = item['Page']
         else:
             for item in response_status['Blocks']:
                 if item["BlockType"] == "LINE":

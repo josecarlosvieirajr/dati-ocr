@@ -1,24 +1,21 @@
-from datiocr.enumerations.enum_test import EnumTeste
+from flask import Flask, request, jsonify
 
-front_table = {}
-add = []
-size = 100
-pag = 0
-response_status = EnumTeste.BACK_TEST.value
-if response_status['DocumentMetadata']['Pages'] > 1:
-    for item in response_status['Blocks']:
-        if item["BlockType"] == "LINE":
-            if item['Page'] != pag and pag != 0:
-                front_table[pag] = add
-                add = []
-            add.append([
-                item['Text'],
-                item['Geometry']['BoundingBox']['Width'] * size,
-                item['Geometry']['BoundingBox']['Height'] * size * 2.5,
-                item['Geometry']['BoundingBox']['Left'] * size,
-                item['Geometry']['BoundingBox']['Top'] * size * 2.3,
-            ])
-            if item['Page'] > pag:
-                pag = item['Page']
+from services.api_dati_ocr import WebApiOcr, WebApiTrain
 
-    print(front_table[2])
+app = Flask(__name__)
+
+
+@app.route('/send_ocr_file', methods=['POST'])
+def first():
+    content = WebApiOcr().run(request.files['file'])
+    return jsonify({'status': 'success', 'content': content})
+
+
+@app.route('/send_data_selected', methods=['POST'])
+def first():
+    content = WebApiTrain().run(request.args)
+    return jsonify({'status': 'success', 'content': content})
+
+
+if __name__ == '__main__':
+    app.run(debug=True, threaded=False)

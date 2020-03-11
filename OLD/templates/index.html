@@ -33,7 +33,7 @@
         {% for a in content %}
             <div class="page {{a}}" style="width: 100%">
                 {% for key in content[a] %}
-                    <div id="myDiv"  onclick="executeClick()" class="text-center" style="border:1px solid; width:{{ key[1] }}vw; height:{{ key[2] }}%; left:{{ key[3] }}vw; top:{{ key[4] }}%;position: absolute;">
+                    <div id="myDiv"  onclick="executeClick()" class="text-center" style="width:{{ key[1] }}vw; height:{{ key[2] }}vc; left:{{ key[3] }}vw; top:{{ key[4] }}%;position: absolute;">
                         <p id="key">{{ key[0] }}</p>
                     </div>
                 {% endfor %}
