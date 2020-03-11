@@ -4,6 +4,11 @@ from services.api_dati_ocr import WebApiOcr, WebApiTrain
 app = Flask(__name__)
 
 
+@app.route('/', methods=['GET'])
+def home():
+    return jsonify({'status': 'success'})
+
+
 @app.route('/send_ocr_file', methods=['POST'])
 def convert_file_to_text():
     content = WebApiOcr().run(request.files['file'])
