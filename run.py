@@ -1,6 +1,4 @@
 from flask import Flask, request, jsonify
-
-from helpers.exception_ocr import exception_handler
 from services.api_dati_ocr import WebApiOcr, WebApiTrain
 
 app = Flask(__name__)
