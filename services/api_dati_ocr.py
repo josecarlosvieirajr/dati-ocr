@@ -14,4 +14,4 @@ class WebApiOcr:
 
 class WebApiTrain:
     def run(self, request):
-        print(request)
+        return {'values': request}
