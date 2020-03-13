@@ -17,9 +17,9 @@ def convert_file_to_text():
 
 @app.route('/send_data_selected', methods=['POST'])
 def train_machine_learning():
-    content = WebApiTrain().run(request.args)
+    content = WebApiTrain().run(request.data)
     return jsonify({'status': 'success', 'content': content})
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, threaded=False)
+    app.run(host='0.0.0.0', port=5000, threaded=False, debug=True)
