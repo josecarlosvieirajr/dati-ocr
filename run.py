@@ -3,7 +3,7 @@ from services.api_dati_ocr import WebApiOcr, WebApiTrain
 from flask_cors import CORS
 
 app = Flask(__name__)
-cors = CORS(app, resources={r"/": {"origins": "*"}})
+cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
 
 @app.route('/', methods=['GET'])
