@@ -24,6 +24,6 @@ class WebApiTrain:
         data_extractor = DataExtractor(data)
         values_selected_by_regex = data_extractor.run()
 
-        return {'value': values_selected_by_regex}
+        return values_selected_by_regex
 
 # {"part_numbers": ["366400"], "quantities": ["17.280,00"], "unit_prices": ["1,72000"]}
