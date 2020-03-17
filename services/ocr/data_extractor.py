@@ -21,19 +21,21 @@ class DataExtractor:
             self.data_from_doc.append(data.decode("UTF-8"))
         part_numbers_regx, quantities_regx, unit_prices_regx = self.create_regex()
 
-        part_numbers_result = self.identify_standards_words(part_numbers_regx)
-        quantities_result = self.identify_standards_words(quantities_regx)
-        unit_prices_result = self.identify_standards_words(unit_prices_regx)
+        part_numbers_result, quantities_result, unit_prices_result = [], [], []
+
+        for part, qtd, unit in zip(part_numbers_regx, quantities_regx, unit_prices_regx):
+            part_numbers_result.append(self.identify_standards_words(part))
+            quantities_result.append(self.identify_standards_words(qtd))
+            unit_prices_result.append(self.identify_standards_words(unit))
 
         return [part_numbers_result, quantities_result, unit_prices_result]
 
     def create_regex(self):
-        part_numbers_regx = self.create_all_regx(self.part_numbers)
-        quantities_regx = self.create_all_regx(self.quantities)
-        unit_prices_regx = self.create_all_regx(self.unit_prices)
-        part_numbers_regx = re.compile(part_numbers_regx)
-        quantities_regx = re.compile(quantities_regx)
-        unit_prices_regx = re.compile(unit_prices_regx)
+        part_numbers_regx, quantities_regx, unit_prices_regx = [], [], []
+        for part, qtd, unit in zip(self.part_numbers, self.quantities, self.unit_prices):
+            part_numbers_regx.append(re.compile(self.create_all_regx(part)))
+            quantities_regx.append(re.compile(self.create_all_regx(qtd)))
+            unit_prices_regx.append(re.compile(self.create_all_regx(unit)))
 
         return part_numbers_regx, quantities_regx, unit_prices_regx
 
