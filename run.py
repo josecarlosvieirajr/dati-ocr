@@ -1,7 +1,9 @@
 from flask import Flask, request, jsonify
 from services.api_dati_ocr import WebApiOcr, WebApiTrain
+from flask_cors import CORS
 
 app = Flask(__name__)
+cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
 
 @app.route('/', methods=['GET'])
@@ -22,4 +24,4 @@ def train_machine_learning():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, threaded=False, debug=True)
+    app.run(host='0.0.0.0', port=5000, threaded=False)
