@@ -46,7 +46,7 @@ class DataExtractor:
                 if digit.isnumeric():
                     regx = '[0-9]'
                 if digit.isalpha():
-                    regx = '[a-zZ-A]'
+                    regx = '[a-zA-Z]'
                 if not digit.isalnum():
                     regx = f"*\{digit}"
                 value_regx = value_regx + regx
