@@ -12,4 +12,4 @@ app.add_url_rule('/send_data_selected', methods=['POST'], view_func=view.train_m
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, threaded=False)
+    app.run(host='0.0.0.0', port=5000, threaded=False, debug=True)
