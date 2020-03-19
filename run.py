@@ -1,26 +1,14 @@
-from flask import Flask, request, jsonify
-from services.api_dati_ocr import WebApiOcr, WebApiTrain
+from flask import Flask
+from server import view
 from flask_cors import CORS
 
 app = Flask(__name__)
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
 
-@app.route('/', methods=['GET'])
-def home():
-    return jsonify({'status': 'success'})
-
-
-@app.route('/send_ocr_file', methods=['POST'])
-def convert_file_to_text():
-    content = WebApiOcr().run(request.files['file'])
-    return jsonify({'status': 'success', 'content': content})
-
-
-@app.route('/send_data_selected', methods=['POST'])
-def train_machine_learning():
-    content = WebApiTrain().run(request.data)
-    return jsonify({'status': 'success', 'content': content})
+app.add_url_rule('/', methods=['GET'], view_func=view.home)
+app.add_url_rule('/send_ocr_file', methods=['POST'], view_func=view.convert_file_to_text)
+app.add_url_rule('/send_data_selected', methods=['POST'], view_func=view.train_machine_learning)
 
 
 if __name__ == '__main__':
