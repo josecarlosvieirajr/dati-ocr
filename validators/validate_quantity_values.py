@@ -14,11 +14,19 @@ class ValidateQuantityValues:
         self.values = values
         items_with_lines = self.get_values_with_lines()
         df = self.get_values_per_line(items_with_lines)
-        df = df.sort_values("position_left")
-        print(df)
+        self.values = self.order_items(df)
 
     def get_values(self):
         return self.values
+
+    @staticmethod
+    def order_items(df):
+        aux = []
+        df = df.sort_values("position_left").drop(['position_x', 'position_y', 'position_top', 'position_left'], axis=1)
+        for i in range(3, len(df.index), 3):
+            df_parse = df.iloc[i - 3:i].sort_values(by="type_array").drop(["type_array"], axis=1)
+            aux.append(df_parse.values.tolist())
+        return aux
 
     def get_values_with_lines(self):
         items_with_lines = []
@@ -38,7 +46,7 @@ class ValidateQuantityValues:
         for item in items:
             name.append(item[0]), position_x.append(float(item[1])),
             position_y.append(float(item[2])), position_top.append(float(item[3])),
-            position_left.append(float(item[4])),  type_array.append(item[5]),
+            position_left.append(float(item[4])), type_array.append(item[5]),
         data = {
             'name': name,
             'position_x': position_x,
