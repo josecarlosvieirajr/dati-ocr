@@ -7,14 +7,31 @@ db = redis.Redis()
 
 class ValidateQuantityValues:
     def __init__(self, data):
-        self.name = data['name']
+        self.name = f"base_{data['name']}"
         self.values = None
 
     def validate(self, values):
-        self.values = values
-        items_with_lines = self.get_values_with_lines()
-        df = self.get_values_per_line(items_with_lines)
-        self.values = self.order_items(df)
+        data_from_doc = json.loads(db.get(self.name).decode("UTF-8"))["obj"]
+        return values
+
+    @staticmethod
+    def format_data(v):
+        top = []
+        flatten = lambda l: [item for sublist in l for item in sublist]
+
+        for i in v:
+            result = list(i.values())
+            for a in result:
+                top.append(list(a.values()))
+
+        return flatten(top)
+
+    # def validate(self, values):
+    #     self.values = values
+    #     items_with_lines = self.get_values_with_lines()
+    #     df = self.get_values_per_line(items_with_lines)
+    #     print(df)
+    #     self.values = self.order_items(df)
 
     def get_values(self):
         return self.values

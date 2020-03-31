@@ -1,9 +1,8 @@
 class ValidateSelectByRegex:
-    def __init__(self):
-        self.params = str()
-
-    def validate_value_regx(self, params):
+    def __init__(self, params):
         self.params = params
+
+    def validate_value_regx(self):
 
         ttp = self.identify_unique_type()
 
@@ -34,4 +33,4 @@ class ValidateSelectByRegex:
             qtd_str = "{%s}" % ttp
             return f"^{self.params[0]}{qtd_str}$"
         else:
-            return self.format_string()
+            return f"^{self.format_string()}$"

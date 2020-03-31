@@ -19,10 +19,26 @@ class ConnectOcr:
                     'Name': self.doc_name
                 }
             },
-            FeatureTypes=['TABLES']
+            FeatureTypes=['TABLES'],
+            ClientRequestToken=f"DocumentDetection{self.doc_name.split('.')[0]}",
+            NotificationChannel={
+                "SNSTopicArn": "arn:aws:sns:us-east-1:296798564631:ocrdatidevTopic",
+                "RoleArn": "arn:aws:iam::296798564631:role/RoleARNocrdatidevTopic"
+            },
+            JobTag="Receipt"
         )
         while self.status == "IN_PROGRESS":
-            self.response_status = self.client.get_document_analysis(JobId=response["JobId"])
+            if "NextToken" in response.keys():
+                self.response_status = self.client.get_document_analysis(
+                    JobId=response["JobId"],
+                    MaxResults=900,
+                    NextToken=response["NextToken"]
+                )
+            else:
+                self.response_status = self.client.get_document_analysis(
+                    JobId=response["JobId"],
+                    MaxResults=900,
+                )
             self.status = self.response_status["JobStatus"]
         return self.response_status
 

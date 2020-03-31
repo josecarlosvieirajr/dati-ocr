@@ -1,7 +1,8 @@
 from flask import jsonify, request
 
-from services.api_dati_ocr import WebApiOcr, WebApiTrain
-from services.ocr_contains_label import OcrContainsLabel
+from services.web_api_contains_label.ocr_contains_label import OcrContainsLabel
+from services.web_api_ocr.api_dati_ocr import WebApiOcr
+from services.web_api_train.web_api_train import WebApiTrain
 
 
 def home():
