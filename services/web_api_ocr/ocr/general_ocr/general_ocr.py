@@ -19,9 +19,13 @@ class GeneralOCR(ConnectOcr):
     def run(self, file):
         self.file = file
         if self.ocr_di_data():
-            # table = FindTableOCR(self.data).run()
+            table = FindTableOCR(self.data).run()
             df = FindTableOCR2(self.data).run()
+
+            json_table = json.dumps({"obj": table})
+            db.set(f'base_{file.filename}', json_table)
             df.to_pickle(f"./dummy_{file.filename}.pkl")
+
             return self.new_general_ocr()
         return False
 

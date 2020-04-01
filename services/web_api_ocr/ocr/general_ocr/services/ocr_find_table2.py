@@ -38,7 +38,6 @@ class FindTableOCR2:
                         row_index = cell['RowIndex']
                         col_index = cell['ColumnIndex']
                         if row_index not in rows:
-                            # create new row
                             rows[row_index] = {}
                         df._set_value(row_index, col_index,  self.get_text(cell, blocks_map))
 

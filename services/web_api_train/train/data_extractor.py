@@ -13,14 +13,19 @@ db = redis.Redis()
 class DataExtractor:
     def __init__(self, data: dict):
         self.data = data
+        self.name = f'base_{data["name"]}'
         self.part_numbers = data['part_numbers']
         self.quantities = data['quantities']
         self.unit_prices = data['unit_prices']
+        self.switch = False
         self.data_from_doc = list()
 
     def run(self):
         item_ocr = FindItemsOcr(self.data)
         self.data_from_doc = item_ocr.do_your_magic()
+
+        if not self.data_from_doc:
+            self.backup_plan_b()
 
         part_numbers_regx, quantities_regx, unit_prices_regx = self.create_regex()
 
@@ -60,12 +65,26 @@ class DataExtractor:
         return value_regx
 
     def identify_standards_words(self, regx_compile):
+        if self.switch:
+            return self.two_way_of_doing_things(regx_compile)
+        return self.one_way_of_doing_things(regx_compile)
+
+    def one_way_of_doing_things(self, regx_compile):
         words_find = []
         for key in self.data_from_doc:
             for data in self.data_from_doc[key]:
                 for i in data.split():
                     if regex.findall(regx_compile, i.strip()):
                         words_find.append(i.strip())
+
+        return words_find
+
+    def two_way_of_doing_things(self, regx_compile):
+        words_find = []
+        for data in self.data_from_doc:
+            for i in data.split():
+                if regex.findall(regx_compile, i.strip()):
+                    words_find.append(i.strip())
 
         return words_find
 
@@ -80,3 +99,7 @@ class DataExtractor:
                 top.append(list(a.values()))
 
         return flatten(top)
+
+    def backup_plan_b(self):
+        self.switch = True
+        self.data_from_doc = self.format_data(json.loads(db.get(self.name).decode("UTF-8"))["obj"])

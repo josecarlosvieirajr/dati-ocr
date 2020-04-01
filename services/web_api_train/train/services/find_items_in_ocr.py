@@ -11,6 +11,8 @@ class FindItemsOcr:
         flatten = lambda l: [item for sublist in l for item in sublist]
         union_data = flatten(flatten([self.data["part_numbers"], self.data["quantities"], self.data["unit_prices"]]))
         req_obj = self.where_are_the_requested_objects(union_data)
+        if not req_obj:
+            return []
         for obj in req_obj:
             result[obj[3]] = self.df[obj[3]].to_numpy()
         return result
