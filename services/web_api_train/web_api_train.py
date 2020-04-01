@@ -10,8 +10,8 @@ class WebApiTrain:
         data_extractor = DataExtractor(data)
         values_selected_by_regex = data_extractor.run()
 
-        validators = ValidateQuantityValues(data)
-        values_selected_by_regex = validators.validate(values_selected_by_regex)
+        # validators = ValidateQuantityValues(data)
+        # values_selected_by_regex = validators.validate(values_selected_by_regex)
 
         return values_selected_by_regex
 

@@ -4,6 +4,7 @@ import redis
 
 from services.web_api_ocr.ocr.general_ocr.services.ocr_connect import ConnectOcr
 from services.web_api_ocr.ocr.general_ocr.services.ocr_find_table import FindTableOCR
+from services.web_api_ocr.ocr.general_ocr.services.ocr_find_table2 import FindTableOCR2
 
 db = redis.Redis()
 
@@ -18,9 +19,9 @@ class GeneralOCR(ConnectOcr):
     def run(self, file):
         self.file = file
         if self.ocr_di_data():
-            table = FindTableOCR(self.data).run()
-            json_table = json.dumps({"obj": table})
-            db.set(f'base_{file.filename}', json_table)
+            # table = FindTableOCR(self.data).run()
+            df = FindTableOCR2(self.data).run()
+            df.to_pickle(f"./dummy_{file.filename}.pkl")
             return self.new_general_ocr()
         return False
 

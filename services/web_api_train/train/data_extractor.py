@@ -1,9 +1,10 @@
 import json
-
+import pandas as pd
 import redis
 import regex
 from typing import NoReturn, List
 
+from services.web_api_train.train.services.find_items_in_ocr import FindItemsOcr
 from validators.values_select_by_regex import ValidateSelectByRegex
 
 db = redis.Redis()
@@ -11,17 +12,15 @@ db = redis.Redis()
 
 class DataExtractor:
     def __init__(self, data: dict):
+        self.data = data
         self.part_numbers = data['part_numbers']
         self.quantities = data['quantities']
         self.unit_prices = data['unit_prices']
-        self.name = f"base_{data['name']}"
         self.data_from_doc = list()
 
     def run(self):
-
-        self.data_from_doc = self.format_data(json.loads(db.get(self.name).decode("UTF-8"))["obj"])
-        if len(self.data_from_doc) == 0:
-            return "Sem Base de dados disponivel"
+        item_ocr = FindItemsOcr(self.data)
+        self.data_from_doc = item_ocr.do_your_magic()
 
         part_numbers_regx, quantities_regx, unit_prices_regx = self.create_regex()
 
@@ -61,10 +60,9 @@ class DataExtractor:
         return value_regx
 
     def identify_standards_words(self, regx_compile):
-        words_find = [words.strip() for words in self.data_from_doc if regex.findall(regx_compile, words.strip())]
-        if not words_find:
-            for data in self.data_from_doc:
-                # words_find = [i.strip() for i in data.split() if regex.findall(regx_compile, i.strip())]
+        words_find = []
+        for key in self.data_from_doc:
+            for data in self.data_from_doc[key]:
                 for i in data.split():
                     if regex.findall(regx_compile, i.strip()):
                         words_find.append(i.strip())
